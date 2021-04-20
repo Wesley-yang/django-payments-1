@@ -53,6 +53,7 @@ class MercadoPagoProvider(BasicProvider):
             raise ValueError("This payment does not have a preference.")
 
         result = self.client.get_preference(payment.transaction_id)
+        logger.error("MP client", exc_info=True)
 
         if result["status"] >= 300:
             raise Exception("Failed to retrieve MercadoPago preference.", result)
@@ -96,6 +97,7 @@ class MercadoPagoProvider(BasicProvider):
 
         logger.debug("Creating preference with payload: %s", payload)
         result = self.client.create_preference(payload)
+        logger.error("MP client", exc_info=True)
 
         if result["status"] >= 300:
             raise Exception("Failed to create MercadoPago preference.", result)
@@ -141,6 +143,7 @@ class MercadoPagoProvider(BasicProvider):
 
     def process_collection(self, payment, collection_id):
         response = self.client.get_payment_info(collection_id)
+        logger.error("MP client", exc_info=True)
         if response["status"] != 200:
             message = "MercadoPago sent invalid payment data."
             payment.change_status(PaymentStatus.ERROR, message)
@@ -190,6 +193,7 @@ class MercadoPagoProvider(BasicProvider):
                 "external_reference": payment.attrs.external_reference,
             },
         )
+        logger.error("MP client", exc_info=True)
         response.raise_for_status()
         data = response.json()
 
